@@ -1,0 +1,9 @@
+{% extends "template_one.html" %}
+{% block title %} View Games {% endblock %}
+
+{% block content %}
+
+<button class="btn bg-light"><a href="{{  url_for('AddGames') }}" style="text-decoration: none; color: black; display: block; margin-right: auto; margin-left: none;"> Add New Game </a></button>
+<button class="btn bg-light"><a href="{{ url_for('AddSounds') }}" style="text-decoration: none; color: black; display:block; margin-right:auto; margin-left: auto;"> Add New Sound </a>  </button>
+
+{% endblock %}

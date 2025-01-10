@@ -1,0 +1,27 @@
+{% extends "template_one.html" %}
+{% block title %} View Events {% endblock %}
+
+{% block content %}
+
+<div style="text-align: center;">
+    <p> Welcome to the ViewEvents Page </p>
+    <button class="btn bg-light"><a href="{{ url_for('AddEvent') }}" style="text-decoration: none; color: black;"> Add New Event </a></button>
+</div>
+<br>
+<div class="table-responsive-md">
+    <table class="table table-striped table-hover">
+        <thead> 
+            <th scope="col"> ID </th>
+            <th scope="col"> Event Name </th>
+            <th scope="col"> Event Description </th>
+            <th scope="col"> Event Location </th>
+            <th scope="col"> Date </th>
+            <th scope="col">  </th>
+        </thead>
+        <tbody>
+            <!-- Add All Events -->
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

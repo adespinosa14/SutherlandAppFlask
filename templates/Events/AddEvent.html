@@ -1,0 +1,61 @@
+{% extends "template_one.html" %}
+{% block title %} Current Events {% endblock %}
+
+{% block content %}
+
+<div style="">
+
+   <form method="post">
+        <div class="form-group row">
+            <label class="col-sm-2 control-label" style="text-align: right;" asp-for="Event.Id"> ID </label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" readonly asp-for="Event.Id" value="@id" style="width:100%;">
+            </div>
+            <span asp-validation-for="Event.Id" class="text-danger"></span>
+        </div>
+
+        <br>
+        <div class="form-group row">
+            <label class="col-sm-2 control-label" style="text-align: right;" asp-for="Event.eventName"> Event Name </label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" asp-for="Event.eventName" placeholder="Enter Event Name Here" style="width:100%;">
+            </div>
+            <span asp-validation-for="Event.eventName" class="text-danger"></span>
+        </div>
+
+        <br>
+        <div class="form-group row">
+            <label class="col-sm-2 control-label" style="text-align: right;" asp-for="Event.eventDescription"> Event Description </label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" asp-for="Event.eventDescription" placeholder="Enter Event Description" style="width:100%;">
+            </div>
+
+            <span asp-validation-for="Event.eventDescription" class="text-danger"></span>
+        </div>
+
+        <br>
+        <div class="form-group row">
+            <label class="col-sm-2 control-label" style="text-align: right;" asp-for="Event.eventLocation"> Event Location </label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" asp-for="Event.eventLocation" placeholder="Enter Event Location" style="width:100%;">
+            </div>
+
+            <span asp-validation-for="Event.eventLocation" class="text-danger"></span>
+        </div>
+
+        <br>
+        <div class="form-group row">
+            <label class="col-sm-2 control-label" style="text-align: right;" asp-for="Event.eventDate"> Event Date </label>
+            <div class="col-sm-10">
+                <input type="date" class="form-control" asp-for="Event.eventDate" placeholder="Enter Event Name Here..." style="width:100%;">
+            </div>
+            <span asp-validation-for="Event.eventDate" class="text-danger"></span>
+        </div>
+
+        <br>
+        <button type="submit" class="btn btn-outline-primary" style="display: block; margin-left: auto; margin-right: auto;"> Submit </button>
+
+    </form>
+</div>
+
+{% endblock %}
