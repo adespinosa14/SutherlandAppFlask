@@ -1,3 +1,9 @@
+<!-- 
+
+This page is the main layout of the website 
+
+-->
+
 <html>
     <head>
         <!-- Bootstrap Installation -->
@@ -7,6 +13,8 @@
         <!-- Any CSS Connection Files -->
         <link href="../static/main_template.css" rel="stylesheet" type="text/css">
         <title>{% block title %}{% endblock %}</title>
+
+        <!-- Navbar -->
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
           <div class="container-fluid">
               <a class="navbar-brand" href="{{ url_for('index') }}">SutherlandApp</a>
@@ -14,16 +22,17 @@
                       aria-expanded="false" aria-label="Toggle navigation">
                   <span class="navbar-toggler-icon"></span>
               </button>
+              <!-- Navbar Items -->
               <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                   <ul class="navbar-nav flex-grow-1">
                       <li class="nav-item">
                           <button class="btn bg-light"> <a href="{{ url_for('index') }}" class="nav-link text-dark">Home</a> </button>
                       </li>
                       <li class="nav-item">
-                          <button class="btn bg-light"> <a href="{{ url_for('ViewGames') }}" class="nav-link text-dark"> View Events </a> </button>
+                        <button class="btn bg-light"> <a href="{{ url_for('CurrentEvents') }}" class="nav-link text-dark"> View Events </a> </button>
                       </li>
                       <li class="nav-item">
-                          <button class="btn bg-light"> <a href="{{ url_for('CurrentEvents') }}" class="nav-link text-dark"> View Games </a> </button>
+                          <button class="btn bg-light"> <a href="{{ url_for('ViewGames') }}" class="nav-link text-dark"> View Games </a> </button>
                       </li>
                   </ul>
               </div>

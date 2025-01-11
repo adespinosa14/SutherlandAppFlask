@@ -1,3 +1,9 @@
+"""
+
+This file has the website backend routes, form handling, and anything else for the
+website's main architecture
+
+"""
 from flask import Flask, render_template
 
 app = Flask(__name__)
