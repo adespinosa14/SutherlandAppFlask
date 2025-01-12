@@ -2,4 +2,88 @@
 {% block title %} Add Games {% endblock %}
 {% block content%}
     <h1> Add Games </h1>
+    <div>
+        <form action="/ViewGames/AddGames/Add_Game">
+            <div class="form-group row">
+                <label class="control-label" class="" for="Id" id="Id"> Id: </label>
+                <div class="col-sm-10">
+                    <input class="form-control" type="text" name="Id" id="Id" value="{{ uuid }}" readonly>
+                </div>
+
+                <label class="control-label" for="game_name" id="game_name"> Game Name: </label>
+                <div class="col-sm-10">
+                    <input class="form-control" type="text" name="game_name" id="game_name" placeholder="Enter Game Name...">
+                </div>
+
+                <label class="control-label" for="game_state" id="game_state"> Game State </label>
+                <div class="col-sm-10">
+                    <input class="form-control" type="text" value="False" readonly>
+                </div>
+                <div id="group_content">
+                    <fieldset >
+
+                    </fieldset>
+                </div>
+            </div>
+            <button class="btn btn-outline-dark" type="button" id="add_group" onclick="addGroup()"> Add Group </button>
+            <br>
+            <br>
+            <button class="center_object btn btn-outline-primary" type="submit" class="btn btn-outline-primary"> Submit </button>
+        </form>
+    </div>
+    <script>
+        var content = document.getElementById("group_content");
+        var group_count = 0;
+        var member_count = 0;
+        function addGroup(){
+            group_count++;
+            member_count = 0;
+            var new_group_string = `
+            
+            <div style="margin-left:5%;">
+                <br>
+                <h2> Group ${group_count} </h2>
+
+                <label class="control-label" class="" for="Group${group_count}Id" id="Group${group_count}Id"> Id: </label>
+                    <div class="col-sm-10">
+                        <input class="form-control" type="text" name="Group${group_count}Id" id="Group${group_count}Id" value="group${group_count}" readonly>
+                </div>
+
+                <label class="control-label" for="game_${group_count}_name" id="game_${group_count}_name"> Group Name: </label>
+                    <div class="col-sm-10">
+                        <input class="form-control" type="text" name="game_${group_count}_name" id="game_${group_count}_name" placeholder="Enter Game Name...">
+                </div>
+                <br>
+                <button class="btn btn-outline-dark" type="button" id="add_group" onclick="addMember()"> Add Member </button>
+            </div>
+
+            `
+            content.innerHTML += new_group_string;
+            
+            console.log(new_group_string);
+        }
+
+        function addMember(){
+            member_count++;
+            console.log("Member Button is Working");
+            var new_member_string = `
+            <br>
+            <div style="margin-left:7%;">
+                <h3> Member: ${member_count} </h3>
+                    <br>
+                    <label class="control-label" for="member_${member_count}" id="member_${member_count}"> Select: </label>
+                    <div class="col-sm-10">
+                        <select class="form-control" name="member_${member_count}" id="member_${member_count}">
+                            {% for sound in sounds %}
+                                <option value="{{sound.id}}"> {{sound.Sound_Name}} </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+            </div>
+            `;
+
+            content.innerHTML += new_member_string;
+        }
+    </script>
 {% endblock %}

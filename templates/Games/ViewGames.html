@@ -3,7 +3,48 @@
 
 {% block content %}
 
-<button class="btn bg-light"><a href="{{  url_for('AddGames') }}" style="text-decoration: none; color: black; display: block; margin-right: auto; margin-left: none;"> Add New Game </a></button>
-<button class="btn bg-light"><a href="{{ url_for('AddSounds') }}" style="text-decoration: none; color: black; display:block; margin-right:auto; margin-left: auto;"> Add New Sound </a>  </button>
+
+<!-- Games Created -->
+<h1 class="center_text"> Created Games</h1>
+<button class="btn bg-light" class="center_object"><a href="{{  url_for('AddGames') }}" style="text-decoration: none; color: black; display: block; margin-right: auto; margin-left: none;"> + </a></button>
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead>
+            <th scope="col"> Id </th>
+            <th scope="col"> Game Name </th>
+            <th scope="col"> # of Groups </th>
+            <th scope="col"> Status </th>
+            <th scope="col"> Change Status </th>
+        </thead>
+        
+        <tbody>
+        
+        </tbody>
+    </table>
+</div>
+<br>
+<h1 class="center_text"> Downloaded Sounds </h1>
+<button class="btn bg-light" class="center_object"><a href="{{ url_for('AddSounds') }}" style="text-decoration: none; color: black; display:block; margin-right:auto; margin-left: auto;"> + </a>  </button>
+<div class="table-responsive-md">
+    <table class="table table-striped table-hover">
+        <thead>
+            <th scope="col">Id</th>
+            <th scope="col">Sound Name</th>
+        </thead>
+        <tbody>
+            {% for sound in sounds %}
+                <tr>
+                    <td>{{ sound.id }}</td>
+                    <td>{{ sound.Sound_Name }} </td>
+                    <td>
+                        <form action="{{ url_for('Delete_Sound', sound_id=sound.id) }}" method="POST" style="display:inline;">
+                            <button class="btn btn-outline-danger" type="submit" onclick="return confirm('Are you sure you want to delete this event?')">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
 {% endblock %}

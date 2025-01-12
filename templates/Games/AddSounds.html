@@ -3,11 +3,11 @@
 {% block content%}
     <h1> Add Sounds </h1>
     <br>
-    <form action="/ViewGames/AddSounds/add_sound" method="POST">
+    <form action="/ViewGames/AddSounds/add_sound" method="POST" enctype="multipart/form-data">
         <div class="form-group row">
             <label class="col-sm-2 control-label" for="Id">Id:</label>
             <div class="col-sm-10">
-                <input class="form-control" id="Id" type="text" name="Id" value="{{uuid}}" readonly>
+                <input class="form-control" id="Id" type="text" name="Id" value="{{ uuid }}" readonly>
             </div>
             <br>
             <label class="col-sm-2 control-label" for="Sound_Name">Sound Name:</label>
@@ -22,6 +22,6 @@
             <br>
         </div>
         <br>
-        <button class="btn btn-outline-success center_object"> Submit </button>
+        <button class="btn btn-outline-primary center_object"> Submit </button>
     </form>
 {% endblock %}

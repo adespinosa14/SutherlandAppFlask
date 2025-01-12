@@ -24,11 +24,43 @@ class Events(db.Model):
     Event_Date = db.Column(db.Date(), nullable = False)
 
     def __repr__(self):
-        return f'<User {self.username}>'
+        return f'<User {self.Event_Name}>'
 # Game Sounds
 class Game_Sounds(db.Model):
+    __tablename__ = 'game__sounds'
+    id = db.Column(db.String(80), primary_key = True)
+    Sound_Name = db.Column(db.String(80), nullable = False)
+    File = db.Column(db.LargeBinary, nullable = False)
+    
+    def __repr__(self):
+        return f'<Sound {self.Sound_Name}>'
+
+# Game Components
+class Games(db.Model):
     id = db.Column(db.String(80), primary_key=True)
-    Sound = db.Column(db.File)
+    name = db.Column(db.String(80), nullable=False)
+    state = db.Column(db.String(20), nullable=False)
+    groups = db.relationship('Groups', backref='game', lazy=True)
+
+# Groups Table
+class Groups(db.Model):
+    id = db.Column(db.String(80), primary_key=True)
+    game_id = db.Column(db.String(80), db.ForeignKey('games.id'), nullable=False)
+    name = db.Column(db.String(80), nullable=False)
+    members = db.relationship('Members', backref='group', lazy=True)
+
+# Members Table
+class Members(db.Model):
+    id = db.Column(db.String(80), primary_key=True)
+    group_id = db.Column(db.String(80), db.ForeignKey('groups.id'), nullable=False)
+    name = db.Column(db.String(80), nullable=False)
+    sounds = db.relationship('MemberSounds', backref='member', lazy=True)
+
+# Member Sound
+class MemberSounds(db.Model):
+    id = db.Column(db.String(80), primary_key=True)
+    member_id = db.Column(db.String(36), db.ForeignKey('members.id'), nullable=False)
+    sound_id = db.Column(db.String(80), db.ForeignKey('game__sounds.id'), nullable=False)
 
 ####### Routes
 @app.route("/Home")
@@ -83,24 +115,51 @@ def delete_event(event_id):
 ####### Game Routes
 @app.route("/ViewGames")
 def ViewGames():
-    return render_template("Games/ViewGames.html")
+    sounds = Game_Sounds.query.all()
+    return render_template("Games/ViewGames.html", sounds=sounds)
 
+#########################################################################      ADD GAMES START
 @app.route("/ViewGames/AddGames")
 def AddGames():
-    return render_template("Games/AddGames.html")
+    my_uuid = uuid.uuid4()
+    sounds = Game_Sounds.query.all()
 
+
+
+    return render_template("Games/AddGames.html", uuid=my_uuid, sounds=sounds)
+
+#########################################################################      ADD GAMES END
 @app.route("/ViewGames/AddSounds")
 def AddSounds():
-    myuuid = uuid.uuid4()
-    return render_template("Games/AddSounds.html", uuid=myuuid)
+    my_uuid = uuid.uuid4()
+    return render_template("Games/AddSounds.html", uuid=my_uuid)
 
 @app.route("/ViewGames/AddSounds/add_sound", methods=['POST'])
 def add_sound():
     if request.method == 'POST':
-        id = request.form['Id']
-        sound = request.form['Sound']
-        print(f"Id: {id}\nSound: {sound}")
-        return redirect(url_for('AddGames'))
+        Id = request.form['Id']
+        sound_name = request.form['Sound_Name']
+        file = request.files['File']
+        print(f"Id: {Id}\nSound Name: {sound_name}\nFile: {file.filename}")
+
+        new_sound = Game_Sounds(
+            id = Id,
+            Sound_Name = sound_name,
+            File = file.read())
+        db.session.add(new_sound)
+        db.session.commit()
+
+        return redirect(url_for('ViewGames'))
+
+@app.route("/ViewGames/Delete_Sound/<string:sound_id>", methods=['POST'])
+def Delete_Sound(sound_id):
+    id = Game_Sounds.query.get(sound_id)
+    print(id)
+    if id:
+        db.session.delete(id)
+        db.session.commit()
+        return redirect(url_for('ViewGames'))
+    return "Sound Not Found"
 
 ####### API calls to retrieve Event + Sound Data
 @app.route("/api/events")

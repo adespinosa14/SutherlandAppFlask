@@ -7,3 +7,7 @@ body{
     margin-right: auto;
     margin-left: auto;
 }
+
+.center_text{
+    text-align: center;
+}
