@@ -1,0 +1,9 @@
+body{
+    margin: 2%;
+}
+
+.center_object{
+    display: block;
+    margin-right: auto;
+    margin-left: auto;
+}

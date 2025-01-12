@@ -4,49 +4,49 @@
 {% block content %}
 
 <div>
-   <form method="post">
+   <form action="/ViewEvents/AddEvent/add-event" method="POST">
         <div class="form-group row">
-            <label class="col-sm-2 control-label" style="text-align: right;"> ID </label>
+            <label class="col-sm-2 control-label" style="text-align: right;" for="eventID"> ID </label>
             <div class="col-sm-10">
-                <input type="text" class="form-control" readonly value="@id" style="width:100%;">
+                <input type="text" class="form-control" readonly id="eventID" name="eventID"value="{{ uuid }}" style="width:100%;">
             </div>
             <span class="text-danger"></span>
         </div>
-
+        <!-- Event Name -->
         <br>
         <div class="form-group row">
-            <label class="col-sm-2 control-label" style="text-align: right;"> Event Name </label>
+            <label class="col-sm-2 control-label" style="text-align: right;" for="eventName"> Event Name </label>
             <div class="col-sm-10">
-                <input type="text" class="form-control" placeholder="Enter Event Name Here" style="width:100%;">
+                <input type="text" class="form-control" placeholder="Enter Event Name Here" name="eventName" id="eventName" style="width:100%;">
             </div>
             <span class="text-danger"></span>
         </div>
-
+        <!-- Event Description -->
         <br>
         <div class="form-group row">
-            <label class="col-sm-2 control-label" style="text-align: right;"> Event Description </label>
+            <label class="col-sm-2 control-label" style="text-align: right;" for="eventDescription"> Event Description </label>
             <div class="col-sm-10">
-                <input type="text" class="form-control" placeholder="Enter Event Description" style="width:100%;">
-            </div>
-
-            <span class="text-danger"></span>
-        </div>
-
-        <br>
-        <div class="form-group row">
-            <label class="col-sm-2 control-label" style="text-align: right;"> Event Location </label>
-            <div class="col-sm-10">
-                <input type="text" class="form-control" placeholder="Enter Event Location" style="width:100%;">
+                <input type="text" class="form-control" placeholder="Enter Event Description" id="eventDescription" name="eventDescription" style="width:100%;">
             </div>
 
             <span class="text-danger"></span>
         </div>
-
+        <!-- Event Location -->
         <br>
         <div class="form-group row">
-            <label class="col-sm-2 control-label" style="text-align: right;" > Event Date </label>
+            <label class="col-sm-2 control-label" style="text-align: right;" for="eventLocation"> Event Location </label>
             <div class="col-sm-10">
-                <input type="date" class="form-control" placeholder="Enter Event Name Here..." style="width:100%;">
+                <input type="text" class="form-control" placeholder="Enter Event Location" id="eventLocation" name="eventLocation" style="width:100%;">
+            </div>
+
+            <span class="text-danger"></span>
+        </div>
+        <!-- Event Date -->
+        <br>
+        <div class="form-group row">
+            <label class="col-sm-2 control-label" style="text-align: right;" for="eventDate"> Event Date </label>
+            <div class="col-sm-10">
+                <input type="date" class="form-control" placeholder="Enter Event Name Here..." id="eventDate" name="eventDate" style="width:100%;">
             </div>
             <span class="text-danger"></span>
         </div>
