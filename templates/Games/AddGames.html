@@ -38,9 +38,9 @@
                     <br>
                     <h2> Group ${group_count} </h2>
     
-                    <label class="control-label" for="group_id_${group_count}"> Id: </label>
+                    <label class="control-label" for="group_id_"> Id: </label>
                     <div class="col-sm-10">
-                        <input class="form-control" type="text" name="group_id[]" id="group_id_${group_count}" value="group${group_count}" readonly>
+                        <input class="form-control" type="text" name="group_id[]" id="group_id_${group_count}" value="group${group_count}{{uuid}}" readonly>
                     </div>
     
                     <label class="control-label" for="group_name_${group_count}"> Group Name: </label>

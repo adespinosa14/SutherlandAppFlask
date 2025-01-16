@@ -12,11 +12,25 @@
         <thead>
             <th scope="col"> Id </th>
             <th scope="col"> Game Name </th>
-            <th scope="col"> # of Groups </th>
             <th scope="col"> Status </th>
-            <th scope="col"> Change Status </th>
+            <th scope="col"> Delete Game </th>
         </thead>
-        
+            {% for game in games %}
+            <tr>
+                <td>{{ game.id }}</td>
+                <td>{{ game.name }}</td>
+                <td> 
+                    <form action="/ViewGames/ChangeState/{{game.id}}" method="POST">
+                        <button class="btn btn-outline-primary" type="submit">{{game.state}}</button> 
+                    </form>
+                </td>
+                <td> 
+                    <form action="/ViewGames/DeleteGame/{{game.id}}" method="POST">
+                        <button class="btn btn-outline-danger" type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
         <tbody>
         
         </tbody>

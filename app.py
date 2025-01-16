@@ -12,7 +12,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import null
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:Taffy2002!!!@localhost:3306/Event_Sound_Data'
+app.config['SQLALCHEMY_DATABASE_URI'] = ''
 app.config['SQLALCHEMY_TRACK_MODIFICATION'] = False
 
 ####### Database Table Model
@@ -42,15 +42,15 @@ class Game_Sounds(db.Model):
 class Games(db.Model):
     id = db.Column(db.String(80), primary_key=True)
     name = db.Column(db.String(80), nullable=False)
-    state = db.Column(db.String(80), nullable=False)
-    groups = db.relationship('Groups', backref='game', lazy=True)
+    state = db.Column(db.Boolean, default=False, nullable=False)
+    groups = db.relationship('Groups', backref='game', cascade='all, delete', lazy=True)
 
 # Groups Table
 class Groups(db.Model):
     id = db.Column(db.String(80), primary_key=True)
     game_id = db.Column(db.String(80), db.ForeignKey('games.id'), nullable=False)
     name = db.Column(db.String(80), nullable=False)
-    members = db.relationship('Members', backref='group', lazy=True)
+    members = db.relationship('Members', backref='group', cascade='all, delete', lazy=True)
 
 class Members(db.Model):
     __tablename__ = 'members'
@@ -120,7 +120,38 @@ def delete_event(event_id):
 @app.route("/ViewGames")
 def ViewGames():
     sounds = Game_Sounds.query.all()
-    return render_template("Games/ViewGames.html", sounds=sounds)
+    games = Games.query.all()
+    return render_template("Games/ViewGames.html", sounds=sounds, games=games)
+
+@app.route("/ViewGames/DeleteGame/<string:game_id>", methods=['POST'])
+def delete_game(game_id):
+    game = Games.query.get(game_id)
+    if game:
+        db.session.delete(game)
+        db.session.commit()
+        return redirect(url_for("ViewGames"))
+    else:
+        return "Error"
+
+@app.route("/ViewGames/ChangeState/<string:game_id>", methods=['POST'])
+def change_state(game_id):
+    game = Games.query.get(game_id)
+    
+    if game:
+        # Ensure the state is either 0 (False) or 1 (True) and toggle it
+        if game.state == 0:
+            game.state = 1  # Set to True
+        elif game.state == 1:
+            game.state = 0  # Set to False
+        else:
+            # If the state is neither 0 nor 1, set it to 0 (default False)
+            game.state = 0
+        
+        db.session.commit()
+        return redirect(url_for("ViewGames"))
+    else:
+        return jsonify({"error": "Game not found"}), 404
+
 
 #########################################################################      ADD GAMES START
 @app.route("/ViewGames/AddGames")
@@ -130,11 +161,15 @@ def AddGames():
     return render_template("Games/AddGames.html", uuid=my_uuid, sounds=sounds)
 
 @app.route("/ViewGames/AddGames/Add_Game", methods=['POST'])
-@app.route("/ViewGames/AddGames/Add_Game", methods=['POST'])
 def add_game():
     game_id = request.form['Id']
     game_name = request.form['game_name']
     game_state = request.form['game_state']
+    # Convert to boolean
+    if game_state.lower() == "true":
+        game_state = True
+    else:
+        game_state = False
 
     # Create a new game record
     new_game = Games(id=game_id, name=game_name, state=game_state)
@@ -209,6 +244,7 @@ def get_game(game_id):
 
     return jsonify(response_data), 200  # 200 OK
 
+# Create API Route
 @app.route("/api/games", methods=["GET"])
 def get_games():
     games = Games.query.all()
