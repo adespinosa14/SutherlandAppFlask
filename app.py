@@ -4,9 +4,12 @@ This file has the website backend routes, form handling, and anything else for t
 website's main architecture
 
 """
+from io import BytesIO
+import mimetypes
 import uuid
-from flask import Flask, jsonify, redirect, render_template, request, url_for
+from flask import Flask, Response, jsonify, redirect, render_template, request, url_for
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import null
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:Taffy2002!!!@localhost:3306/Event_Sound_Data'
@@ -39,7 +42,7 @@ class Game_Sounds(db.Model):
 class Games(db.Model):
     id = db.Column(db.String(80), primary_key=True)
     name = db.Column(db.String(80), nullable=False)
-    state = db.Column(db.String(20), nullable=False)
+    state = db.Column(db.String(80), nullable=False)
     groups = db.relationship('Groups', backref='game', lazy=True)
 
 # Groups Table
@@ -49,12 +52,13 @@ class Groups(db.Model):
     name = db.Column(db.String(80), nullable=False)
     members = db.relationship('Members', backref='group', lazy=True)
 
-# Members Table
 class Members(db.Model):
-    id = db.Column(db.String(80), primary_key=True)
-    group_id = db.Column(db.String(80), db.ForeignKey('groups.id'), nullable=False)
-    name = db.Column(db.String(80), nullable=False)
-    sounds = db.relationship('MemberSounds', backref='member', lazy=True)
+    __tablename__ = 'members'
+    id = db.Column(db.String(80), primary_key=True, default=str(uuid.uuid4()))
+    group_id = db.Column(db.String(80), db.ForeignKey('groups.id'))
+    name = db.Column(db.String(80))
+    sound_id = db.Column(db.String(80))  # Store a single sound ID for each member
+
 
 # Member Sound
 class MemberSounds(db.Model):
@@ -123,10 +127,108 @@ def ViewGames():
 def AddGames():
     my_uuid = uuid.uuid4()
     sounds = Game_Sounds.query.all()
-
-
-
     return render_template("Games/AddGames.html", uuid=my_uuid, sounds=sounds)
+
+@app.route("/ViewGames/AddGames/Add_Game", methods=['POST'])
+@app.route("/ViewGames/AddGames/Add_Game", methods=['POST'])
+def add_game():
+    game_id = request.form['Id']
+    game_name = request.form['game_name']
+    game_state = request.form['game_state']
+
+    # Create a new game record
+    new_game = Games(id=game_id, name=game_name, state=game_state)
+    db.session.add(new_game)
+
+    # Process groups and members
+    group_ids = request.form.getlist('group_id[]')
+    group_names = request.form.getlist('group_name[]')
+
+    for i, group_id in enumerate(group_ids):
+        group_name = group_names[i]
+        new_group = Groups(id=group_id, game_id=game_id, name=group_name)
+        db.session.add(new_group)
+
+        member_names = request.form.getlist(f'member_name[{i + 1}][]')
+        sound_ids = request.form.getlist(f'sound_id[{i + 1}][]')
+
+        for j, member_name in enumerate(member_names):
+            # Create a new member with a single sound
+            sound_id = sound_ids[j]  # Each member picks one sound
+            new_member = Members(
+                id=str(uuid.uuid4()),
+                group_id=group_id,
+                name=member_name,
+                sound_id=sound_id  # Associate the single sound with the member
+            )
+            db.session.add(new_member)
+
+    db.session.commit()
+    return redirect(url_for('ViewGames'))
+
+# Create API Call
+@app.route("/api/games/<game_id>", methods=['GET'])
+def get_game(game_id):
+    # Retrieve the game from the database
+    game = Games.query.get(game_id)
+
+    if not game:
+        return jsonify({"error": "Game not found"}), 404  # 404 Not Found if the game doesn't exist
+
+    # Retrieve the groups associated with the game
+    groups = Groups.query.filter_by(game_id=game_id).all()
+
+    groups_data = []
+    for group in groups:
+        # Retrieve members for each group
+        members = Members.query.filter_by(group_id=group.id).all()
+        members_data = []
+
+        for member in members:
+            members_data.append({
+                "id": member.id,
+                "name": member.name,
+                "sound_id": member.sound_id
+            })
+
+        groups_data.append({
+            "group_id": group.id,
+            "group_name": group.name,
+            "members": members_data
+        })
+
+    # Prepare the response data
+    response_data = {
+        "game": {
+            "id": game.id,
+            "name": game.name,
+            "state": game.state
+        },
+        "groups": groups_data
+    }
+
+    return jsonify(response_data), 200  # 200 OK
+
+@app.route("/api/games", methods=["GET"])
+def get_games():
+    games = Games.query.all()
+    response = []
+    for game in games:
+        game_data = {
+            "id": game.id,
+            "name": game.name,
+            "state": game.state,
+            "groups": []
+        }
+        response.append(game_data)
+        for group in game.groups:
+            group_data = {
+                "id": group.id,
+                "name": group.name,
+                "members": [{"id": member.id, "name": member.name, "sound_id": member.sound_id} for member in group.members]
+            }
+            game_data["groups"].append(group_data)
+    return jsonify(response)
 
 #########################################################################      ADD GAMES END
 @app.route("/ViewGames/AddSounds")
@@ -167,6 +269,21 @@ def retrieve_events():
     events = Events.query.all()
     event_list = [event_to_dict(event) for event in events]
     return  jsonify(event_list)
+
+@app.route('/api/sounds/<sound_id>', methods=['GET'])
+def get_sound(sound_id):
+    # Fetch the sound from the database
+    sound = Game_Sounds.query.filter_by(id=sound_id).first()
+    if not sound:
+        return jsonify({"error": "Sound not found"}), 404
+
+    # Assuming sound.audio contains the BLOB data of the audio file
+    audio_data = sound.File
+    mime_type, _ = mimetypes.guess_type(sound.Sound_Name)  # Assumes you store the file name
+    if mime_type is None:
+        mime_type = "audio/mpeg"  # Default to audio/mpeg if type could not be guessed
+    
+    return Response(BytesIO(audio_data), mimetype=mime_type)
 
 ####### Convert Events to a Dictionary
 def event_to_dict(event):
