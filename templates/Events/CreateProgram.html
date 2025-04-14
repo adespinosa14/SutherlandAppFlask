@@ -1,0 +1,21 @@
+{% extends 'template_one.html' %}
+{% block title %} Create Programs {% endblock %}
+
+{% block content %}
+<div class="Create_Programs">
+    <form class="form-control" action="{{ url_for('CreateProgram') }}" method="post">
+        <input type="text" name="name" placeholder="Program name" required>
+      
+        <p>Select games to include:</p>
+        {% for game in games %}
+          <div>
+            <input type="checkbox" name="games" value="{{ game.id }}">
+            {{ game.name }}
+          </div>
+        {% endfor %}
+      
+        <button class="btn btn-outline-primary" type="submit">Create Program</button>
+      </form>
+</div>
+
+{% endblock %}

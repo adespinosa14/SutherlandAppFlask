@@ -43,7 +43,14 @@ class Games(db.Model):
     id = db.Column(db.String(80), primary_key=True)
     name = db.Column(db.String(80), nullable=False)
     state = db.Column(db.Boolean, default=False, nullable=False)
+    programs_id = db.Column(db.String(80), db.ForeignKey('programs.id'), nullable = True)
     groups = db.relationship('Groups', backref='game', cascade='all, delete', lazy=True)
+
+# Program Lists
+class Programs(db.Model):
+        id = db.Column(db.String(80), primary_key = True)
+        name = db.Column(db.String(80), nullable = False)
+        games = db.relationship('Games', backref='programs', lazy = True, order_by = 'Games.name')
 
 # Groups Table
 class Groups(db.Model):
@@ -76,7 +83,9 @@ def index():
 @app.route("/CurrentEvents")
 def CurrentEvents():
     events = Events.query.all()
-    return render_template("Events/ViewEvents.html", events=events)
+    programs = Programs.query.all()
+    print(programs)
+    return render_template("Events/ViewEvents.html", events=events, programs=programs)
 
 @app.route("/ViewEvents/AddEvent")
 def AddEvent():
@@ -152,6 +161,26 @@ def change_state(game_id):
     else:
         return jsonify({"error": "Game not found"}), 404
 
+##### Create Program
+@app.route("/ViewGames/CreateProgram", methods=['GET', 'POST'])
+def CreateProgram():
+    if request.method == 'POST':
+        program_name = request.form['name']
+        selected_game_ids = request.form.getlist('games')  # This will be a list of game IDs
+
+        new_program = Programs(id=str(uuid.uuid4()), name=program_name)
+        db.session.add(new_program)
+
+        for game_id in selected_game_ids:
+            game = Games.query.get(game_id)
+            if game:
+                game.programs_id = new_program.id  # Assign the program
+
+        db.session.commit()
+        return redirect(url_for('ViewGames'))
+
+    games = Games.query.all()
+    return render_template("Events/CreateProgram.html", games=games)
 
 #########################################################################      ADD GAMES START
 @app.route("/ViewGames/AddGames")
@@ -201,7 +230,7 @@ def add_game():
     db.session.commit()
     return redirect(url_for('ViewGames'))
 
-# Create API Call
+####################################################### Create API Call
 @app.route("/api/games/<game_id>", methods=['GET'])
 def get_game(game_id):
     # Retrieve the game from the database
