@@ -3,33 +3,6 @@
 
 {% block content %}
 
-
-<!-- Games Created -->
-<h1 class="center_text"> Created Games</h1>
-<button class="btn bg-light" class="center_object"><a href="{{  url_for('AddGames') }}" style="text-decoration: none; color: black; display: block; margin-right: auto; margin-left: none;"> + </a></button>
-<div class="table-responsive">
-    <table class="table table-striped table-hover">
-        <thead>
-            <th scope="col"> Id </th>
-            <th scope="col"> Game Name </th>
-            <th scope="col"> Delete Game </th>
-        </thead>
-            {% for game in games %}
-            <tr>
-                <td>{{ game.id }}</td>
-                <td>{{ game.name }}</td>
-                <td> 
-                    <form action="/ViewGames/DeleteGame/{{game.id}}" method="POST">
-                        <button class="btn btn-outline-danger" type="submit">Delete</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        <tbody>
-        
-        </tbody>
-    </table>
-</div>
 <h1> Program List </h1>
 <button class="btn bg-light" class="center_object"><a href="{{ url_for('CreateProgram') }}" style="text-decoration: none; color: black; display: block; margin-left: auto; margin-right: auto;"> + </a>  </button>
 <table class="table table-striped table-hover">
@@ -57,7 +30,35 @@
     </tbody>
 </table>
 <br>
-<h1 class="center_text"> Downloaded Sounds </h1>
+
+<!-- Games Created -->
+<h1 class=""> Created Games</h1>
+<button class="btn bg-light" class="center_object"><a href="{{  url_for('AddGames') }}" style="text-decoration: none; color: black; display: block; margin-right: auto; margin-left: none;"> + </a></button>
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead>
+            <th scope="col"> Id </th>
+            <th scope="col"> Game Name </th>
+            <th scope="col"> Delete Game </th>
+        </thead>
+            {% for game in games %}
+            <tr>
+                <td>{{ game.id }}</td>
+                <td>{{ game.name }}</td>
+                <td> 
+                    <form action="/ViewGames/DeleteGame/{{game.id}}" method="POST">
+                        <button class="btn btn-outline-danger" type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        <tbody>
+        
+        </tbody>
+    </table>
+</div>
+
+<h1 class=""> Downloaded Sounds </h1>
 <button class="btn bg-light" class="center_object"><a href="{{ url_for('AddSounds') }}" style="text-decoration: none; color: black; display:block; margin-right:auto; margin-left: auto;"> + </a>  </button>
 <div class="table-responsive-md">
     <table class="table table-striped table-hover">

@@ -4,12 +4,16 @@
 {% block content %}
 <div class="Create_Programs">
     <form class="form-control" action="{{ url_for('CreateProgram') }}" method="post">
+        <label name="name" for="name"> Program Name: </label>
         <input type="text" name="name" placeholder="Program name" required>
 
-        <label class="control-label" for="program_state" id="program_state"> Program State </label>
-        <div class="col-sm-10">
-            <input class="form-control" name="program_state" type="text" value="False" readonly>
+        <br>
+        <br>
+        <div class="" style="display: flex;">
+            <label class="control-label" name="program_state" for="program_state" id="program_state" style="width: 10%;"> Program State: </label>
+            <input class="form-control" name="program_state" type="text" value="False" style="width: 10%;" readonly>
         </div>
+        <br>
         <p>Select games to include:</p>
         {% for game in games %}
           <div>
@@ -18,7 +22,8 @@
           </div>
         {% endfor %}
       
-        <button class="btn btn-outline-primary" type="submit">Create Program</button>
+        <br>
+        <button class="btn btn-outline-primary center_object" type="submit">Create Program</button>
       </form>
 </div>
 
