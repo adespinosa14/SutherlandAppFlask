@@ -42,7 +42,6 @@ class Game_Sounds(db.Model):
 class Games(db.Model):
     id = db.Column(db.String(80), primary_key=True)
     name = db.Column(db.String(80), nullable=False)
-    state = db.Column(db.Boolean, default=False, nullable=False)
     programs_id = db.Column(db.String(80), db.ForeignKey('programs.id'), nullable = True)
     groups = db.relationship('Groups', backref='game', cascade='all, delete', lazy=True)
 
@@ -50,6 +49,7 @@ class Games(db.Model):
 class Programs(db.Model):
         id = db.Column(db.String(80), primary_key = True)
         name = db.Column(db.String(80), nullable = False)
+        state = db.Column(db.Boolean, default=False, nullable=False)
         games = db.relationship('Games', backref='programs', lazy = True, order_by = 'Games.name')
 
 # Groups Table
@@ -130,7 +130,8 @@ def delete_event(event_id):
 def ViewGames():
     sounds = Game_Sounds.query.all()
     games = Games.query.all()
-    return render_template("Games/ViewGames.html", sounds=sounds, games=games)
+    programs = Programs.query.all()
+    return render_template("Games/ViewGames.html", sounds=sounds, games=games, programs=programs)
 
 @app.route("/ViewGames/DeleteGame/<string:game_id>", methods=['POST'])
 def delete_game(game_id):
@@ -141,20 +142,30 @@ def delete_game(game_id):
         return redirect(url_for("ViewGames"))
     else:
         return "Error"
-
-@app.route("/ViewGames/ChangeState/<string:game_id>", methods=['POST'])
-def change_state(game_id):
-    game = Games.query.get(game_id)
     
-    if game:
+@app.route("/ViewGames/DeleteProgram/<string:program_id>", methods=['POST'])
+def delete_program(program_id):
+    program = Programs.query.get(program_id)
+    if program:
+        db.session.delete(program)
+        db.session.commit()
+        return redirect(url_for("ViewGames"))
+    else:
+        return "Error"
+
+@app.route("/ViewGames/ChangeState/<string:program_id>", methods=['POST'])
+def change_state(program_id):
+    program = Programs.query.get(program_id)
+    
+    if program:
         # Ensure the state is either 0 (False) or 1 (True) and toggle it
-        if game.state == 0:
-            game.state = 1  # Set to True
-        elif game.state == 1:
-            game.state = 0  # Set to False
+        if program.state == 0:
+            program.state = 1  # Set to True
+        elif program.state == 1:
+            program.state = 0  # Set to False
         else:
             # If the state is neither 0 nor 1, set it to 0 (default False)
-            game.state = 0
+            program.state = 0
         
         db.session.commit()
         return redirect(url_for("ViewGames"))
@@ -166,9 +177,16 @@ def change_state(game_id):
 def CreateProgram():
     if request.method == 'POST':
         program_name = request.form['name']
+        game_state = request.form['program_state']
+
+        if game_state.lower() == "true":
+            game_state = True
+        else:
+            game_state = False
+
         selected_game_ids = request.form.getlist('games')  # This will be a list of game IDs
 
-        new_program = Programs(id=str(uuid.uuid4()), name=program_name)
+        new_program = Programs(id=str(uuid.uuid4()), name=program_name, state=game_state)
         db.session.add(new_program)
 
         for game_id in selected_game_ids:
@@ -193,15 +211,9 @@ def AddGames():
 def add_game():
     game_id = request.form['Id']
     game_name = request.form['game_name']
-    game_state = request.form['game_state']
-    # Convert to boolean
-    if game_state.lower() == "true":
-        game_state = True
-    else:
-        game_state = False
 
     # Create a new game record
-    new_game = Games(id=game_id, name=game_name, state=game_state)
+    new_game = Games(id=game_id, name=game_name)
     db.session.add(new_game)
 
     # Process groups and members
@@ -231,6 +243,27 @@ def add_game():
     return redirect(url_for('ViewGames'))
 
 ####################################################### Create API Call
+@app.route('/api/programs', methods=['GET'])
+def api_get_programs():
+    programs = Programs.query.all()
+    output = []
+
+    for program in programs:
+        program_data = {
+            'id': program.id,
+            'name': program.name,
+            'state': program.state,
+            'games': [
+                {
+                    'id': game.id,
+                    'name': game.name,
+                } for game in program.games
+            ]
+        }
+        output.append(program_data)
+
+    return jsonify(output)
+
 @app.route("/api/games/<game_id>", methods=['GET'])
 def get_game(game_id):
     # Retrieve the game from the database
@@ -266,7 +299,6 @@ def get_game(game_id):
         "game": {
             "id": game.id,
             "name": game.name,
-            "state": game.state
         },
         "groups": groups_data
     }
